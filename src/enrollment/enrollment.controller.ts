@@ -7,17 +7,25 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/generated/prisma/enums';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
 import { UpdateEnrollmentStatusDto } from './dto/update-enrollment-status.dto';
 import { EnrollmentService } from './enrollment.service';
 
 @Controller('enrollment')
+@UseGuards(JwtAuthGuard)
 export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 
   // GET /enrollment - Liste toutes les inscriptions (pour ADMIN)
   @Get()
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   getAllEnrollments() {
     return this.enrollmentService.getAllEnrollments();
   }
@@ -48,6 +56,8 @@ export class EnrollmentController {
 
   // PUT /enrollment/:id/status - Approuver/Rejeter une inscription (ADMIN)
   @Put(':id/status')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   updateEnrollmentStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateEnrollmentStatusDto,
@@ -63,6 +73,8 @@ export class EnrollmentController {
 
   // GET /enrollment/pending - Liste des inscriptions en attente (ADMIN)
   @Get('status/pending')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
   getPendingEnrollments() {
     return this.enrollmentService.getEnrollmentsByStatus('PENDING');
   }
