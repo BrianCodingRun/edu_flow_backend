@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
+import { CreateCourseDTO } from './dto/create-course.dto';
+import { UpdateCourseDTO } from './dto/update-course.dto';
 
 @Injectable()
 export class CourseService {
@@ -21,23 +23,13 @@ export class CourseService {
     return course;
   }
 
-  async createCourse(data) {
-    // const courseExisting = await this.prisma.course.findUnique({
-    //   where: { name: data.name },
-    // });
-
-    // if (courseExisting) {
-    //   throw new BadRequestException(
-    //     'Cette formation existe déjà, veuillez en choisir une autre !',
-    //   );
-    // }
-
+  async createCourse(data: CreateCourseDTO) {
     return this.prisma.course.create({
       data,
     });
   }
 
-  async updateCourse(id: number, data) {
+  async updateCourse(id: number, data: UpdateCourseDTO) {
     const course = await this.prisma.course.findUnique({
       where: { id },
     });
